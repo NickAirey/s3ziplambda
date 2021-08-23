@@ -7,7 +7,7 @@ def lambda_handler(event, context):
 
     def extractAndUpload(zipObj):
         filename = zipObj.filename
-        # s3.meta.client.upload_fileobj(zipfile.open(filename), Bucket=bucketName, Key=f'{filename}')
+        s3.meta.client.upload_fileobj(zipfile.open(filename), Bucket=bucketName, Key=f'{filename}')
         return "s3://"+bucketName+"/"+filename
 
     def isNotDir(zipObj): 
