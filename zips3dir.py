@@ -20,16 +20,16 @@ def lambda_handler(event, context):
                     print("found key "+content['Key']+" "+str(content['Size']))
                     yield key
 
-    def getFileAndWriteToZip(bucketKey):
-        object = s3.Object(bucket_name=bucketName, key=bucketKey)
+    def getFileAndWriteToZip(objectKey):
         # create buffer and read object from s3 into buffer
+        object = s3.Object(bucket_name=bucketName, key=objectKey)
         objectBuffer = BytesIO(object.get()["Body"].read())
         # seek to end of buffer to show size (should match what s3 index claims)
         objectBuffer.seek(0,2)
-        print("retrieved "+bucketKey+" "+str(objectBuffer.tell()))
+        print("retrieved "+objectKey+" "+str(objectBuffer.tell()))
         # reset buffer and write buffer as new entry in zip file
         objectBuffer.seek(0)
-        zipFile.writestr(bucketKey, objectBuffer.read())
+        zipFile.writestr(objectKey, objectBuffer.read())
         # close buffer
         objectBuffer.close()
 
@@ -43,7 +43,7 @@ def lambda_handler(event, context):
     zipBuffer = BytesIO()
     zipFile = ZipFile(zipBuffer, mode="w")
 
-    # get S3 keys, get ecach file and write to zip
+    # get S3 keys, get each file and write to zip
     list(map(getFileAndWriteToZip, getS3Keys(bucketName, prefix=keyPrefixToZip, suffix=keySuffix)))
 
     # close zip file, keep zipbuffer
